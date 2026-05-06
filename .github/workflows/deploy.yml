@@ -3,7 +3,6 @@ name: "Terragrunt Targeted Deploy"
 on:
   push:
     branches: [ main ]
-  # This adds the "Manual" button in GitHub
   workflow_dispatch:
     inputs:
       target_env:
@@ -37,18 +36,24 @@ jobs:
         with:
           terragrunt_version: 0.50.0
 
-      # Logic to decide which folder to run
       - name: Terragrunt Execution
         run: |
-          if [ "${{ github.event.inputs.target_env }}" == "dev" ]; then
-            echo "Deploying only DEV..."
-            cd live/dev && terragrunt apply --terragrunt-non-interactive
+          # Use 'both' as default if triggered by push (where input is empty)
+          TARGET="${{ github.event.inputs.target_env }}"
+          if [ -z "$TARGET" ]; then TARGET="both"; fi
+
+          if [ "$TARGET" == "dev" ]; then
+            DEV_PATH=$(find . -name "dev" -type d | grep -v ".terragrunt-cache" | head -n 1)
+            echo "Found Dev at: $DEV_PATH"
+            cd "$DEV_PATH" && terragrunt apply --terragrunt-non-interactive
           
-          elif [ "${{ github.event.inputs.target_env }}" == "prod" ]; then
-            echo "Deploying only PROD..."
-            cd live/prod && terragrunt apply --terragrunt-non-interactive
+          elif [ "$TARGET" == "prod" ]; then
+            PROD_PATH=$(find . -name "prod" -type d | grep -v ".terragrunt-cache" | head -n 1)
+            echo "Found Prod at: $PROD_PATH"
+            cd "$PROD_PATH" && terragrunt apply --terragrunt-non-interactive
           
           else
-            echo "Deploying BOTH environments..."
-            cd live && terragrunt run-all apply --terragrunt-non-interactive
+            LIVE_PATH=$(find . -name "live" -type d | grep -v ".terragrunt-cache" | head -n 1)
+            echo "Found Live at: $LIVE_PATH"
+            cd "$LIVE_PATH" && terragrunt run-all apply --terragrunt-non-interactive
           fi
