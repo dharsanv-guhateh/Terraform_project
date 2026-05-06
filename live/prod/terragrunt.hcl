@@ -1,5 +1,5 @@
 include "root" { path = find_in_parent_folders() }
-terraform { source = "../../modules/compute-network" }
+terraform { source = "../../Modules/compute_network" }
 
 inputs = {
   aws_region    = "us-east-1" # Virginia
