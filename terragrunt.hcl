@@ -12,7 +12,7 @@ EOF
 # We pull the region from the child's inputs
 locals {
   # This finds the 'aws_region' defined in the child's 'inputs' block
-  aws_region = read_terragrunt_config(find_in_parent_folders("terragrunt.hcl")).inputs.aws_region
+  aws_region = "us-east-1"
 }
 
 remote_state {
@@ -20,7 +20,7 @@ remote_state {
   config = {
     bucket         = "my-terraform-state-${get_aws_account_id()}"
     key            = "${path_relative_to_include()}/terraform.tfstate"
-    region         = local.aws_region # The state bucket region matches the env region
+    region         = "us-east-1"
     encrypt        = true
     dynamodb_table = "terraform-lock-table"
   }
