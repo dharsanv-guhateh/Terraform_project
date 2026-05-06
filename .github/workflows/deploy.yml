@@ -1,0 +1,54 @@
+name: "Terragrunt Targeted Deploy"
+
+on:
+  push:
+    branches: [ main ]
+  # This adds the "Manual" button in GitHub
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: 'Select Environment to Deploy'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - dev
+          - prod
+          - both
+
+jobs:
+  terragrunt_deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v1.3.2
+        with:
+          terragrunt_version: 0.50.0
+
+      # Logic to decide which folder to run
+      - name: Terragrunt Execution
+        run: |
+          if [ "${{ github.event.inputs.target_env }}" == "dev" ]; then
+            echo "Deploying only DEV..."
+            cd live/dev && terragrunt apply --terragrunt-non-interactive
+          
+          elif [ "${{ github.event.inputs.target_env }}" == "prod" ]; then
+            echo "Deploying only PROD..."
+            cd live/prod && terragrunt apply --terragrunt-non-interactive
+          
+          else
+            echo "Deploying BOTH environments..."
+            cd live && terragrunt run-all apply --terragrunt-non-interactive
+          fi
