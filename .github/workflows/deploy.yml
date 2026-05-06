@@ -45,15 +45,15 @@ jobs:
           if [ "$TARGET" == "dev" ]; then
             DEV_PATH=$(find . -name "dev" -type d | grep -v ".terragrunt-cache" | head -n 1)
             echo "Found Dev at: $DEV_PATH"
-            cd "$DEV_PATH" && terragrunt apply --terragrunt-non-interactive
+            cd "$DEV_PATH" && terragrunt apply --terragrunt-non-interactive -auto-approve
           
           elif [ "$TARGET" == "prod" ]; then
             PROD_PATH=$(find . -name "prod" -type d | grep -v ".terragrunt-cache" | head -n 1)
             echo "Found Prod at: $PROD_PATH"
-            cd "$PROD_PATH" && terragrunt apply --terragrunt-non-interactive
+            cd "$PROD_PATH" && terragrunt apply --terragrunt-non-interactive -auto-approve
           
           else
             LIVE_PATH=$(find . -name "live" -type d | grep -v ".terragrunt-cache" | head -n 1)
             echo "Found Live at: $LIVE_PATH"
-            cd "$LIVE_PATH" && terragrunt run-all apply --terragrunt-non-interactive
+            cd "$LIVE_PATH" && terragrunt run-all apply --terragrunt-non-interactive -auto-approve
           fi
