@@ -18,7 +18,7 @@ jobs:
       - name: Setup Terragrunt
         uses: autero1/action-terragrunt@v1.3.2
         with:
-          terragrunt_version: 1.5.7
+          terragrunt_version: 0.55.0
 
       - name: Terragrunt Destroy
         env:
