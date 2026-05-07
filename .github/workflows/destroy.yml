@@ -1,0 +1,22 @@
+name: Terragrunt Destroy
+
+on:
+  workflow_dispatch: # This allows you to run it manually from the Actions tab
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Terragrunt
+        uses: autero1/action-terragrunt@v1.3.2
+        with:
+          terragrunt_version: latest
+
+      - name: Destroy Infrastructure
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          PROD_PATH=$(find . -name "prod" -type d | grep -v ".terragrunt-cache" | head -n 1)
+          cd "$PROD_PATH" && terragrunt destroy --terragrunt-non-interactive -auto-approve
