@@ -1,19 +1,26 @@
 name: Terragrunt Destroy
 
-on:
-  workflow_dispatch: # This allows you to run it manually from the Actions tab
+on: 
+  workflow_dispatch:
 
 jobs:
-  destroy:
+  cleanup:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # --- NEW STEP: Install Terraform ---
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7 # Use the same version you used for deploy
+
       - name: Setup Terragrunt
         uses: autero1/action-terragrunt@v1.3.2
         with:
-          terragrunt_version: latest
+          terragrunt_version: 1.5.7
 
-      - name: Destroy Infrastructure
+      - name: Terragrunt Destroy
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
